@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const login = (req, res, next) => {
-    console.log('aaaaaa');
+    console.log('aaaaaa11111');
     const password = req.body.password;
     console.log('aaaa')
     User.findOne({ where: { email: req.body.email } })
