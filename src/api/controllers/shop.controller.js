@@ -91,9 +91,9 @@ exports.postOrder = async(req, res) => {
 }
 
 exports.payment = async(req, res, next) => {
-    const order = req.locals;
+    order = req.locals;
     const { paymentMethod, amount } = req.body;
-
+    console.log(order)
     if (order.total <= amount) {
         await Order.update({ status: status.paid }, { where: { id: order.id } })
         console.log("thanh toán hết ")
@@ -109,7 +109,27 @@ exports.payment = async(req, res, next) => {
         paymentMethod,
         amount,
         orderId: order.id
-    }).then(payment => { return res.json(payment) })
+    })
+
+    const id = req.params.id;
+    Payment.findAll({
+        where: { orderId: id },
+        attributes: ['orderId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
+        group: ['Payment.orderId'],
+        raw: true,
+        order: sequelize.literal('total DESC')
+    }).then(pay => {
+        pay.map((pr) => {
+            Order.findOne({ where: { id: id, userId: req.user.id } }).then(
+                order => {
+                    if (pr.total >= order.total) {
+                        Order.update({ status: status.paid }, { where: { id: id, userId: req.user.id } })
+                    }
+                }
+            )
+            return res.json(pr)
+        })
+    })
 }
 
 exports.getAllOrder = async(req, res) => {
@@ -118,17 +138,23 @@ exports.getAllOrder = async(req, res) => {
 };
 
 exports.checkPayment = async(req, res) => {
+    const id = req.params.id;
     await Payment.findAll({
+        where: { orderId: id },
         attributes: ['orderId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
         group: ['Payment.orderId'],
         raw: true,
         order: sequelize.literal('total DESC')
     }).then(pay => {
-        pay.map(pr => {
-            Order.findOne({ where: { id: pr.id, userId: req.user.id } }).then(
-                order => console.log(order.id, pr.total)
+        pay.map((pr) => {
+            Order.findOne({ where: { id: id, userId: req.user.id } }).then(
+                order => {
+                    if (pr.total >= order.total) {
+                        Order.update({ status: status.paid }, { where: { id: id, userId: req.user.id } })
+                    }
+                    console.log(pr.total, order.total)
+                }
             )
-
             return res.json(pr)
         })
     })

@@ -14,6 +14,6 @@ router.post('/cart-delete-item', isLogin, CheckCart.checkDelCart, shopController
 router.post('/create-order', isLogin, CheckCart.checkOrder, shopController.postOrder);
 router.post('/update-cart', isLogin, CheckCart.checkUpdateCart, shopController.updateCart);
 router.post('/create-payment/:id', isLogin, PaymentValidate(), validate, CheckCart.checkPayment, shopController.payment);
-router.post('/payment/:id', isLogin, CheckCart.checkOrder, shopController.checkPayment);
+router.post('/payment/:id', isLogin, CheckCart.checkPayment, shopController.checkPayment);
 
 module.exports = router;
