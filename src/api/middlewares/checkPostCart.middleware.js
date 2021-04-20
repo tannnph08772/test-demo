@@ -28,8 +28,20 @@ const checkPostCart = async(req, res, next) => {
                 return Product.findByPk(prodId);
             }
         })
+    product = req.locals;
     res.locals.cartItem = await CartItem.findOne({ where: { cartId: res.locals.cartId, productId: prodId } })
-    return next();
+    if (!res.locals.cartItem == "") {
+        const cartItem = await CartItem.update({
+            quantity: res.locals.newQty,
+            totalPrice: new Number(res.locals.newQty) * new Number(product.price),
+            priceItem: product.price
+        }, { where: { cartId: res.locals.cartId, productId: product.id } })
+        product.update({ quantity: (product.quantity - 1) });
+        return res.json(cartItem);
+    } else {
+        product.update({ quantity: (product.quantity - 1) });
+        return next();
+    }
 }
 
 module.exports = checkPostCart;
