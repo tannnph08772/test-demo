@@ -1,4 +1,6 @@
 const { body, validationResult } = require('express-validator')
+    // const Joi = require('joi');
+
 const createUserValidate = () => {
     return [
         body('username', 'Tên không để trống!').not().isEmpty(),
@@ -26,3 +28,15 @@ module.exports = {
     createUserValidate,
     validate,
 }
+
+// const authSchema = Joi.object({
+//     username: Joi.string().required(),
+//     email: Joi.string().email().required(),
+//     password: Joi.required(),
+//     phoneNumber: Joi.number().required(),
+//     address: Joi.string().required(),
+//     birthday: Joi.date().iso().required(),
+//     sex: Joi.string().required(),
+// })
+
+// module.exports = { authSchema }

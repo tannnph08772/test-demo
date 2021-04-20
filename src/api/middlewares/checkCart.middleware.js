@@ -105,8 +105,9 @@ exports.checkOrder = async(req, res, next) => {
 
 exports.checkPayment = async(req, res, next) => {
     req.locals = await Order.findOne({ where: { id: req.params.id, userId: req.user.id } })
-    if (req.locals == "") {
-        return res.send("Bạn chưa có sản phẩm để thanh toán")
+    console.log(req.locals)
+    if (req.locals == null) {
+        return res.json("Bạn chưa có sản phẩm để thanh toán");
     } else {
         return next();
     }
