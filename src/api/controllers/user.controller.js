@@ -3,7 +3,6 @@ const Cart = require('../models/cart.model')
 const bcrypt = require('bcrypt');
 
 exports.getUsers = async(req, res, next) => {
-    console.log(User)
     const allUser = await User.findAll({ include: Cart });
     res.json(allUser)
 }

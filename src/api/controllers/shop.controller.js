@@ -15,7 +15,6 @@ exports.getCart = async(req, res) => {
 exports.postCart = async(req, res, next) => {
     const newQty = 1;
     product = req.locals
-        // console.log(res.locals.cartId)
     if (res.locals.cartItem == null) {
         await CartItem.create({
             cartId: res.locals.cartId,
@@ -136,26 +135,3 @@ exports.getAllOrder = async(req, res) => {
     const allOrder = await modelOrder.getAllOrder();
     return res.json(allOrder);
 };
-
-exports.checkPayment = async(req, res) => {
-    const id = req.params.id;
-    await Payment.findAll({
-        where: { orderId: id },
-        attributes: ['orderId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
-        group: ['Payment.orderId'],
-        raw: true,
-        order: sequelize.literal('total DESC')
-    }).then(pay => {
-        pay.map((pr) => {
-            Order.findOne({ where: { id: id, userId: req.user.id } }).then(
-                order => {
-                    if (pr.total >= order.total) {
-                        Order.update({ status: status.paid }, { where: { id: id, userId: req.user.id } })
-                    }
-                    console.log(pr.total, order.total)
-                }
-            )
-            return res.json(pr)
-        })
-    })
-}
