@@ -29,7 +29,7 @@ const checkPostCart = async(req, res, next) => {
                 return Product.findByPk(prodId);
             }
         })
-    product = req.locals;
+    const product = req.locals;
 
     res.locals.cartItem = await CartItem.findOne({ where: { cartId: res.locals.cartId, productId: prodId } })
     if (!res.locals.cartItem == "") {

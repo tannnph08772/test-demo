@@ -1,5 +1,6 @@
 const sequelize = require('../../../database/connection');
 const Sequelize = require('sequelize');
+const Cart = require('./cart.model');
 
 const User = sequelize.define("users", {
     id: {
@@ -39,4 +40,5 @@ const User = sequelize.define("users", {
     }
 
 });
+User.hasOne(Cart);
 module.exports = User;

@@ -59,6 +59,7 @@ exports.checkUpdateCart = async(req, res, next) => {
         req.locals.update({ quantity: req.locals.quantity + 1 })
         return [req.locals.cartItem.destroy(), res.send("Product is deleted!")]
     } else {
+        req.locals.update({ quantity: req.locals.quantity + 1 })
         return next();
     }
 

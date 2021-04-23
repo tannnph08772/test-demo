@@ -8,34 +8,11 @@ const session = require('express-session');
 const router = require('./src/api/routes/index.route');
 const Product = require('./src/api/models/product.model');
 const User = require('./src/api/models/user.model');
-const Cart = require('./src/api/models/cart.model');
-const CartItem = require('./src/api/models/cartItem.model');
 const Order = require('./src/api/models/order.model').Order;
 const OrderItem = require('./src/api/models/orderItem.model');
-const Category = require('./src/api/models/category.model').Category;
 const Payment = require('./src/api/models/payment.model').Payment;
 const initializePassport = require("./src/api/middlewares/passport.middleware.js");
 initializePassport(passport);
-
-Category.hasMany(Product, {
-    as: "products",
-    foreignKey: 'cateId'
-});
-
-Product.belongsTo(Category, {
-    as: "products",
-    foreignKey: 'cateId'
-});
-
-User.hasOne(Cart);
-Cart.belongsTo(User);
-
-Cart.belongsToMany(Product, {
-    through: CartItem
-});
-Product.belongsToMany(Cart, {
-    through: CartItem
-});
 
 Order.belongsTo(User);
 User.hasMany(Order);

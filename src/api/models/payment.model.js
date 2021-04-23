@@ -17,8 +17,6 @@ const Payment = sequelize.define("Payment", {
         type: Sequelize.INTEGER,
         allowNull: false
     }
-}, {
-    hooks: {}
 });
 Payment.afterCreate(async(payment, options) => {
         await Payment.findAll({
@@ -28,8 +26,8 @@ Payment.afterCreate(async(payment, options) => {
             raw: true,
             order: sequelize.literal('total DESC')
         }).then(payment => {
-            payment.map((pay) => {
-                Order.findOne({ where: { id: pay.orderId } }).then(
+            payment.map(async(pay) => {
+                await Order.findOne({ where: { id: pay.orderId } }).then(
                     order => {
                         if (pay.total >= order.total) {
                             Order.update({ status: status.paid }, { where: { id: pay.orderId } })

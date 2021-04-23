@@ -2,6 +2,7 @@ const sequelize = require('../../../database/connection');
 const Sequelize = require('sequelize');
 const Payment = require("./payment.model");
 const events = require('events');
+const User = require('./user.model');
 const eventEmitter = new events.EventEmitter();
 
 const Order = sequelize.define('Order', {

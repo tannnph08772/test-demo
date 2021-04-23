@@ -1,7 +1,7 @@
 const { body, validationResult } = require('express-validator')
 const createCategoryValidate = () => {
     return [
-        body('cateName', 'Tên danh mục không được để trống!').not().isEmpty(),
+        body('cateName', 'Tên danh mục không được để trống!').not().isEmpty().isLength({ min: 5 }),
     ]
 }
 

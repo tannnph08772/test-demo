@@ -10,7 +10,10 @@ const eventEmitter = new events.EventEmitter();
 exports.getCart = async(req, res) => {
     eventEmitter.on('clicked', async() => {
         const abc = await Cart.findOne({ where: { userId: req.user.id }, include: ['products'] })
-        return res.json(abc)
+        const respone = {
+            data: abc
+        }
+        return res.json(respone)
     })
     eventEmitter.emit('clicked');
 };
@@ -19,15 +22,17 @@ exports.postCart = async(req, res, next) => {
     const newQty = 1;
     const product = req.locals
 
-    await CartItem.create({
+    const data = await CartItem.create({
         cartId: res.locals.cartId,
         productId: product.id,
         priceItem: product.price,
         totalPrice: newQty * new Number(product.price),
         quantity: newQty
-    }).then(
-        abc => res.json(abc)
-    )
+    })
+    const respone = {
+        data: data
+    }
+    return res.json(respone)
 };
 
 exports.updateCart = async(req, res, next) => {
