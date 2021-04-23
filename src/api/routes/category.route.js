@@ -7,7 +7,7 @@ const { createCategoryValidate, validate } = require('../validators/createCatego
 router.get('/edit/:id', cateController.edit);
 router.post('/update/:id', cateController.update);
 router.post('/delete/:id', cateController.deleted);
-router.post('/create', createCategoryValidate(), validate, cateController.create);
+router.post('/create', cateController.create);
 router.get('/list-category', cateController.show)
 
 module.exports = router;

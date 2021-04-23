@@ -4,11 +4,12 @@ const Payment = require("../models/payment.model");
 const Order = require('../models/order.model').Order;
 const status = require('../../../util/statusOrder');
 const sequelize = require('../../../database/connection');
+const OrderItem = require("../models/orderItem.model");
 
 exports.checkUserCart = async(req, res, next) => {
     const shopCart = await Cart.findOne({ where: { userId: req.user.id } })
     if (!shopCart) {
-        req.user.createCart();
+        await req.user.createCart();
         return next();
     }
     return next();
@@ -56,7 +57,7 @@ exports.checkUpdateCart = async(req, res, next) => {
         return res.send('Không thể thực hiện thao tác này')
     } else if (res.locals.products != "" && req.locals.cartItem.quantity == 1) {
         req.locals.update({ quantity: req.locals.quantity + 1 })
-        return req.locals.cartItem.destroy();
+        return [req.locals.cartItem.destroy(), res.send("Product is deleted!")]
     } else {
         return next();
     }
@@ -106,8 +107,6 @@ exports.checkOrder = async(req, res, next) => {
     if (req.locals == "") {
         return res.status(403).json("Bạn chưa có sản phẩm");
     } else {
-        // console.log(res.locals.cart)
-        res.locals.cart.setProducts('null');
         return next();
     }
 };
@@ -117,25 +116,6 @@ exports.checkPayment = async(req, res, next) => {
     res.locals.paymentMethod = paymentMethod;
     res.locals.amount = amount;
 
-    // const id = req.params.id;
-    // Payment.findAll({
-    //     where: { orderId: id },
-    //     attributes: ['orderId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
-    //     group: ['Payment.orderId'],
-    //     raw: true,
-    //     order: sequelize.literal('total DESC')
-    // }).then(pay => {
-    //     pay.map((pr) => {
-    //         Order.findOne({ where: { id: id, userId: req.user.id } }).then(
-    //             order => {
-    //                 if (pr.total >= order.total) {
-    //                     Order.update({ status: status.paid }, { where: { id: id, userId: req.user.id } })
-    //                 }
-    //             }
-    //         )
-    //         return next()
-    //     })
-    // })
     req.locals = await Order.findOne({ where: { id: req.params.id, userId: req.user.id } })
 
     if (req.locals == null) {
@@ -144,14 +124,21 @@ exports.checkPayment = async(req, res, next) => {
 
         if (req.locals.total <= amount) {
             await Order.update({ status: status.paid }, { where: { id: req.locals.id } })
-            console.log("thanh toán hết ")
             return next();
         } else if (amount < req.locals.total && amount > 0) {
             await Order.update({ status: status.missing }, { where: { id: req.locals.id } })
-            console.log("chưa thanh toán hết ")
             return next();
         } else {
             return res.json("Không thể thanh toán");
         }
+    }
+};
+
+exports.checkUpdateOrder = async(req, res, next) => {
+    req.locals = await OrderItem.findOne({ where: { id: req.body.id } })
+    if (req.locals == null) {
+        return res.json("Undefinded!")
+    } else {
+        return next();
     }
 };

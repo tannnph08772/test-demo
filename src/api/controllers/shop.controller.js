@@ -1,6 +1,5 @@
-const Product = require('../models/product.model');
 const CartItem = require('../models/cartItem.model');
-const Payment = require("../models/payment.model");
+const Payment = require("../models/payment.model").Payment;
 const status = require('../../../util/statusOrder');
 const Order = require('../models/order.model').Order;
 const modelOrder = require('../models/order.model');
@@ -10,15 +9,15 @@ const eventEmitter = new events.EventEmitter();
 
 exports.getCart = async(req, res) => {
     eventEmitter.on('clicked', async() => {
-        const abc = await Cart.findOne({ where: { userId: req.user.id }, include: Product })
-        res.json(abc)
+        const abc = await Cart.findOne({ where: { userId: req.user.id }, include: ['products'] })
+        return res.json(abc)
     })
     eventEmitter.emit('clicked');
 };
 
 exports.postCart = async(req, res, next) => {
     const newQty = 1;
-    product = req.locals
+    const product = req.locals
 
     await CartItem.create({
         cartId: res.locals.cartId,
@@ -32,18 +31,19 @@ exports.postCart = async(req, res, next) => {
 };
 
 exports.updateCart = async(req, res, next) => {
-    product = req.locals
+    const product = req.locals
     await CartItem.update({
-        quantity: res.locals.newQty,
-        totalPrice: new Number(res.locals.newQty) * new Number(product.price),
-        priceItem: product.price
-    }, { where: { cartId: res.locals.cartId, productId: product.id } })
-    res.send("ok")
+            quantity: res.locals.newQty,
+            totalPrice: new Number(res.locals.newQty) * new Number(product.price),
+            priceItem: product.price
+        }, { where: { cartId: res.locals.cartId, productId: product.id } })
+        .then(cartItem => { return res.json(cartItem) })
 };
 
 exports.deleteItem = (req, res) => {
-    products = req.locals;
+    const products = req.locals;
     const product = products[0];
+
     product.cartItem.destroy();
     return res.send("đã xóa thành công")
 };
@@ -51,11 +51,9 @@ exports.deleteItem = (req, res) => {
 exports.getOrders = (req, res) => {
     Order.findAll({
             where: { userId: req.user.id },
-            include: [{ model: Product }, { model: Payment }]
+            include: ['products', { model: Payment }]
         })
-        .then(orders => {
-            res.json(orders)
-        })
+        .then(orders => { return res.json(orders) })
 };
 
 exports.postOrder = async(req, res, next) => {
@@ -66,16 +64,8 @@ exports.postOrder = async(req, res, next) => {
         total: res.locals.total,
         quantity: res.locals.qty,
         status: status.unpaid
-    }).then(order => {
-        order.addProduct(products.map(pro => {
-            pro.orderItem = {
-                quantity: pro.cartItem.quantity,
-                totalPrice: pro.cartItem.totalPrice,
-                priceItem: pro.cartItem.priceItem
-            };
-            return pro;
-        }))
     })
+    return res.send("Created order")
 }
 
 exports.payment = async(req, res, next) => {
@@ -86,11 +76,18 @@ exports.payment = async(req, res, next) => {
         paymentMethod: res.locals.paymentMethod,
         amount: res.locals.amount,
         orderId: order.id
-    }).then(payment => res.json(payment))
+    }).then(abc => { return res.json(abc) })
 
 }
 
 exports.getAllOrder = async(req, res) => {
     const allOrder = await modelOrder.getAllOrder();
     return res.json(allOrder);
+};
+
+exports.updateOrder = async(req, res) => {
+    const orderItem = req.locals;
+
+    orderItem.update({ quantity: req.body.quantity, totalPrice: (orderItem.priceItem * req.body.quantity) })
+    return res.json("Updated!");
 };

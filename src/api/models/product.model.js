@@ -27,10 +27,6 @@ const Product = sequelize.define("products", {
     status: {
         type: Sequelize.STRING
     },
-    cateId: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-    },
     price: {
         type: Sequelize.INTEGER,
         allowNull: false

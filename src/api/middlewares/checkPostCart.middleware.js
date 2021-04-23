@@ -1,5 +1,6 @@
-const Product = require('../models/product.model')
-const CartItem = require('../models/cartItem.model')
+const Product = require('../models/product.model');
+const CartItem = require('../models/cartItem.model');
+const Cart = require('../models/cart.model');
 
 const checkPostCart = async(req, res, next) => {
     // req.locals ? req.locals : {};
@@ -29,6 +30,7 @@ const checkPostCart = async(req, res, next) => {
             }
         })
     product = req.locals;
+
     res.locals.cartItem = await CartItem.findOne({ where: { cartId: res.locals.cartId, productId: prodId } })
     if (!res.locals.cartItem == "") {
         const cartItem = await CartItem.update({

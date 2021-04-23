@@ -1,6 +1,6 @@
 const sequelize = require('../../../database/connection');
 const Sequelize = require('sequelize');
-const Product = require('../models/product.model')
+const Product = require('../models/product.model');
 
 const Category = sequelize.define("categories", {
     cateName: {
@@ -8,6 +8,16 @@ const Category = sequelize.define("categories", {
         allowNull: false
     }
 });
+
+// sequelize.sync().then(function() {
+//     Category.create({
+//         cateName: "Cate3"
+//     })
+//     Category.afterCreate((function(cate, options) {
+//         console.log(1111);
+//     }))
+// })
+
 // module.exports = Category;
 module.exports = class Categories {
     constructor() {
@@ -19,4 +29,11 @@ module.exports = class Categories {
         })
     };
     static Category = Category;
+    static postOrder() {
+
+        Category.afterCreate(async(cate, options) => {
+            await cate.update({ cateName: "qqqqqqqqqqqq" })
+        })
+    }
+
 };

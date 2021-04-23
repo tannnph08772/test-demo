@@ -13,7 +13,7 @@ const CartItem = require('./src/api/models/cartItem.model');
 const Order = require('./src/api/models/order.model').Order;
 const OrderItem = require('./src/api/models/orderItem.model');
 const Category = require('./src/api/models/category.model').Category;
-const Payment = require('./src/api/models/payment.model');
+const Payment = require('./src/api/models/payment.model').Payment;
 const initializePassport = require("./src/api/middlewares/passport.middleware.js");
 initializePassport(passport);
 
@@ -67,7 +67,6 @@ app.use(function(req, res, next) {
     res.locals.user = req.user;
     next();
 });
-
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })

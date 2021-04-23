@@ -10,11 +10,12 @@ exports.show = async(req, res, next) => {
 }
 
 exports.create = async(req, res, next) => {
-    Category.create({
-            cateName: req.body.cateName,
-        })
-        .then(category => { res.json(category) })
-        .catch(next);
+    Category.Category.update({
+        cateName: req.body.cateName,
+    }, { where: { id: 1 } })
+    await Category.Category.afterUpdate(async(cate, options) => {
+        console.log(cate)
+    });
 }
 
 exports.edit = async(req, res, next) => {
